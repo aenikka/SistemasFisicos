@@ -7,17 +7,17 @@ void setup()
 void Bomb()
 {
 
-  enum class pressedButton {SETUP, ACTIVATE , };
+  enum class BombState {SETUP, ACTIVATED};
   static uint8_t counter = 20;
-  static pressedButton pressedbutton =  pressedButton::SETUP;
+  static BombState bombstate =  BombState::SETUP;
   static uint32_t previousMillis = 0;
   const uint32_t interval = 1000;
 
 
-  switch (pressedbutton)
+  switch (bombstate)
   {
 
-    case  pressedButton::SETUP:
+    case  BombState::SETUP:
       {
         
         //condicional para leer los eventos que quiera evaluar
@@ -43,7 +43,7 @@ void Bomb()
           }
           else if (dataRx == 'a')
           {
-            pressedbutton = pressedButton::ACTIVATE;
+            bombstate = BombState::ACTIVATED;
             previousMillis = millis();
 
           }
@@ -54,7 +54,7 @@ void Bomb()
       }
 
 
-    case pressedButton::ACTIVATE:
+    case BombState::ACTIVATED:
       {
         if (Serial.available() > 0)
         {
@@ -73,7 +73,7 @@ void Bomb()
 
           if (counter == 0)
           {
-            pressedbutton = pressedButton::SETUP;
+            bombstate = BombState::SETUP;
             Serial.println("KABOOM!");
             counter = 20;
 
