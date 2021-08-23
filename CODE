@@ -108,7 +108,7 @@ void pressButton() {
      
       }
 
-    default:
+   default:
       Serial.println("Error");
       break;
   }
@@ -116,4 +116,20 @@ void pressButton() {
   
   
 }
+}
+
+ 
+
+void loop() {
+  task();
+  
+  uint32_t currentMillis = millis();
+
+  if (currentMillis - previousMillis >= counter) {
+    previousMillis = currentMillis;
+    if (ledState == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
 }
