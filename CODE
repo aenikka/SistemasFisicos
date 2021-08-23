@@ -3,6 +3,9 @@ void setup()
   Serial.begin(115200);
 }
 
+void SendSignal()
+{
+}
 
 void Bomb()
 {
@@ -12,6 +15,8 @@ void Bomb()
   static BombState bombstate =  BombState::SETUP;
   static uint32_t previousMillis = 0;
   const uint32_t interval = 1000;
+  int rightpassword[] = {'d', 'u', 'd', 'd', 'u', 'a'};
+  int answer[6];
 
 
   switch (bombstate)
@@ -19,7 +24,7 @@ void Bomb()
 
     case  BombState::SETUP:
       {
-        
+
         //condicional para leer los eventos que quiera evaluar
         //UP,DOWN,ARM
         if (Serial.available() > 0) {
@@ -56,48 +61,55 @@ void Bomb()
 
     case BombState::ACTIVATED:
       {
-        if (Serial.available() > 0)
-        {
-          int dataRx = Serial.read();
-
-
-
-        }
-
+        //Countdown
         if (millis() - previousMillis >= interval)
         {
           counter --;
           previousMillis = millis();
           Serial.println(counter);
 
-
           if (counter == 0)
           {
             bombstate = BombState::SETUP;
             Serial.println("KABOOM!");
             counter = 20;
-
           }
+
+
+        }
+        //Option to defuse bomb
+
+        for (int i = 0; i < 6; i++)
+        {
+          if (Serial.available() > 0) 
+          {
+            int input = Serial.read();
+            answer[i] = input;
+            Serial.println(answer[i]);
+          }
+
+        }
+
+        
+
+          break;
         }
 
 
+      default:
+        Serial.println("Error");
         break;
       }
 
 
-    default:
-      Serial.println("Error");
-      break;
+
+
   }
 
 
 
+  void loop() {
+    Bomb();
+    SendSignal();
 
-}
-
-
-
-void loop() {
-  Bomb();
-
-}
+  }
