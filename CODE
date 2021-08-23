@@ -1,0 +1,119 @@
+void setup() {
+  Serial.begin(115200);
+}
+
+void task() {
+  enum class DebounceStates {INIT, WAITING_CHANGE, WAITING_STABLE};
+  static DebounceStates debounceState =  DebounceStates::INIT;
+  static uint8_t inputPinStableValue;
+  static uint32_t referenceTime;
+  const uint8_t INPUTPIN = 2;
+  const uint32_t STABLETIMEOUT = 100;
+
+  switch (debounceState) {
+
+    case DebounceStates::INIT: {
+        pinMode(INPUTPIN, INPUT_PULLUP);
+        inputPinStableValue = digitalRead(INPUTPIN);
+        debounceState = DebounceStates::WAITING_CHANGE;
+        Serial.println("DebounceStates::INIT");
+        break;
+      }
+    case DebounceStates::WAITING_CHANGE: {
+        if (digitalRead(INPUTPIN) != inputPinStableValue) {
+          referenceTime = millis();
+          debounceState = DebounceStates::WAITING_STABLE;
+          Serial.println("pin changes");
+        }
+
+        break;
+      }
+    case DebounceStates::WAITING_STABLE: {
+        uint8_t pinState = digitalRead(INPUTPIN);
+        if ( pinState == inputPinStableValue) {
+          debounceState = DebounceStates::WAITING_CHANGE;
+        }
+        else if ( (millis() - referenceTime) >= STABLETIMEOUT) {
+          inputPinStableValue = pinState;
+          debounceState = DebounceStates::WAITING_CHANGE;
+          Serial.print("pinState:");
+          Serial.println(inputPinStableValue);
+        }
+        break;
+      }
+
+    default:
+      Serial.println("Error");
+      break;
+  }
+  
+  
+  
+}
+
+void pressButton() {
+  
+  enum class pressedButton {UP, DOWN, ARM};
+  static pressedButton pressedbutton =  pressedButton::default;
+  //static uint8_t inputPinStableValue;
+  //static uint32_t referenceTime;
+ // const uint8_t INPUTPIN = 2;
+  //const uint32_t STABLETIMEOUT = 100;
+  static counter = 10;
+  
+  if(Serial.available() > 0){
+    int dataRx = Serial.read()
+      
+       switch (dataRx) {
+
+    case  "u" {
+       
+      if (counter < 60)
+      { 
+        counter++;
+      }
+      else if {counter == 60}
+      {
+        counter = 10;
+      }
+      
+                 
+      
+      }
+      
+    case "d" 
+    {
+       if (counter < 60)
+      { 
+        counter--;
+      }
+      else if {counter == 60}
+      {
+        counter = 10;
+      }
+      
+     }
+
+       
+      }
+    
+    case "a" {
+      
+      uint32_t previousMillis = 0;
+      const uint32_t interval = 1000;
+      
+      
+      
+      
+     
+      }
+
+    default:
+      Serial.println("Error");
+      break;
+  }
+  
+  
+  
+}
+}
