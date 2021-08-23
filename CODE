@@ -1,135 +1,103 @@
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 }
 
-void task() {
-  enum class DebounceStates {INIT, WAITING_CHANGE, WAITING_STABLE};
-  static DebounceStates debounceState =  DebounceStates::INIT;
-  static uint8_t inputPinStableValue;
-  static uint32_t referenceTime;
-  const uint8_t INPUTPIN = 2;
-  const uint32_t STABLETIMEOUT = 100;
 
-  switch (debounceState) {
+void Bomb()
+{
 
-    case DebounceStates::INIT: {
-        pinMode(INPUTPIN, INPUT_PULLUP);
-        inputPinStableValue = digitalRead(INPUTPIN);
-        debounceState = DebounceStates::WAITING_CHANGE;
-        Serial.println("DebounceStates::INIT");
-        break;
-      }
-    case DebounceStates::WAITING_CHANGE: {
-        if (digitalRead(INPUTPIN) != inputPinStableValue) {
-          referenceTime = millis();
-          debounceState = DebounceStates::WAITING_STABLE;
-          Serial.println("pin changes");
+  enum class pressedButton {SETUP, ACTIVATE , };
+  static uint8_t counter = 20;
+  static pressedButton pressedbutton =  pressedButton::SETUP;
+  static uint32_t previousMillis = 0;
+  const uint32_t interval = 1000;
+
+
+  switch (pressedbutton)
+  {
+
+    case  pressedButton::SETUP:
+      {
+        
+        //condicional para leer los eventos que quiera evaluar
+        //UP,DOWN,ARM
+        if (Serial.available() > 0) {
+          int dataRx = Serial.read();
+
+          if (dataRx == 'u')
+          {
+            if (counter < 60)
+            {
+              counter++;
+              Serial.println(counter);
+            }
+          }
+          else if (dataRx == 'd')
+          {
+            if (counter > 10)
+            {
+              counter--;
+              Serial.println(counter);
+            }
+          }
+          else if (dataRx == 'a')
+          {
+            pressedbutton = pressedButton::ACTIVATE;
+            previousMillis = millis();
+
+          }
+
         }
 
         break;
       }
-    case DebounceStates::WAITING_STABLE: {
-        uint8_t pinState = digitalRead(INPUTPIN);
-        if ( pinState == inputPinStableValue) {
-          debounceState = DebounceStates::WAITING_CHANGE;
+
+
+    case pressedButton::ACTIVATE:
+      {
+        if (Serial.available() > 0)
+        {
+          int dataRx = Serial.read();
+
+
+
         }
-        else if ( (millis() - referenceTime) >= STABLETIMEOUT) {
-          inputPinStableValue = pinState;
-          debounceState = DebounceStates::WAITING_CHANGE;
-          Serial.print("pinState:");
-          Serial.println(inputPinStableValue);
+
+        if (millis() - previousMillis >= interval)
+        {
+          counter --;
+          previousMillis = millis();
+          Serial.println(counter);
+
+
+          if (counter == 0)
+          {
+            pressedbutton = pressedButton::SETUP;
+            Serial.println("KABOOM!");
+            counter = 20;
+
+          }
         }
+
+
         break;
       }
+
 
     default:
       Serial.println("Error");
       break;
   }
-  
-  
-  
+
+
+
+
 }
 
-void pressButton() {
-  
-  enum class pressedButton {UP, DOWN, ARM};
-  static pressedButton pressedbutton =  pressedButton::default;
-  //static uint8_t inputPinStableValue;
-  //static uint32_t referenceTime;
- // const uint8_t INPUTPIN = 2;
-  //const uint32_t STABLETIMEOUT = 100;
-  static counter = 10;
-  
-  if(Serial.available() > 0){
-    int dataRx = Serial.read()
-      
-       switch (dataRx) {
 
-    case  "u" {
-       
-      if (counter < 60)
-      { 
-        counter++;
-      }
-      else if {counter == 60}
-      {
-        counter = 10;
-      }
-      
-                 
-      
-      }
-      
-    case "d" 
-    {
-       if (counter < 60)
-      { 
-        counter--;
-      }
-      else if {counter == 60}
-      {
-        counter = 10;
-      }
-      
-     }
-
-       
-      }
-    
-    case "a" {
-      
-      uint32_t previousMillis = 0;
-      const uint32_t interval = 1000;
-      
-      
-      
-      
-     
-      }
-
-   default:
-      Serial.println("Error");
-      break;
-  }
-  
-  
-  
-}
-}
-
- 
 
 void loop() {
-  task();
-  
-  uint32_t currentMillis = millis();
+  Bomb();
 
-  if (currentMillis - previousMillis >= counter) {
-    previousMillis = currentMillis;
-    if (ledState == LOW) {
-      ledState = HIGH;
-    } else {
-      ledState = LOW;
-    }
 }
