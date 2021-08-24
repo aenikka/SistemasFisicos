@@ -5,6 +5,10 @@ void setup()
 
 void SendSignal()
 {
+   // Una señal cada 1HZ, analog al 50%
+  //int val = analogRead(0);
+  //val = map(val, 0, 1023, 0, 255);
+  //analogWrite(9, val);
 }
 
 void Bomb()
@@ -17,6 +21,7 @@ void Bomb()
   const uint32_t interval = 1000;
   int rightpassword[] = {'d', 'u', 'd', 'd', 'u', 'a'};
   int answer[6];
+  static bool isCorrect = false;
 
 
   switch (bombstate)
@@ -78,38 +83,85 @@ void Bomb()
 
         }
         //Option to defuse bomb
-
-        for (int i = 0; i < 6; i++)
+        if (Serial.available() > 0)
         {
-          if (Serial.available() > 0) 
+
+          int input0 = Serial.read();
+          answer[0] = input0;
+          Serial.println(answer[0]);
+
+          int input1 = Serial.read();
+          answer[1] = input1;
+          Serial.println(answer[1]);
+
+
+          int input2 = Serial.read();
+          answer[2] = input2;
+          Serial.println(answer[2]);
+
+
+          int input3 = Serial.read();
+          answer[3] = input3;
+          Serial.println(answer[3]);
+
+
+          int input4 = Serial.read();
+          answer[4] = input4;
+          Serial.println(answer[4]);
+
+
+          int input5 = Serial.read();
+          answer[5] = input5;
+          Serial.println(answer[5]);
+
+
+          if (answer[5] != NULL)
           {
-            int input = Serial.read();
-            answer[i] = input;
-            Serial.println(answer[i]);
+            for (int i = 1; i < 6; ++i)
+            {
+              if (answer[i] != rightpassword[i])
+              {
+                isCorrect = false;;
+                break;
+              }
+            }
+
+            if (isCorrect == true)
+              printf("Arrays are equal");
+
           }
 
+
+
+
+
         }
 
-        
-
-          break;
-        }
-
-
-      default:
-        Serial.println("Error");
-        break;
       }
 
 
 
+      break;
+
+    default:
+      Serial.println("Error");
+      break;
 
   }
+}
 
 
 
-  void loop() {
-    Bomb();
-    SendSignal();
 
-  }
+
+
+
+
+
+
+
+void loop() {
+  Bomb();
+  SendSignal();
+
+}
