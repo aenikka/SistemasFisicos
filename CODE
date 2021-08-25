@@ -3,14 +3,14 @@ void setup()
   Serial.begin(115200);
 }
 
-void sendSignal(){
+void sendSignal() {
   static uint32_t previousMillis = 0;
   static const uint32_t interval = 500;
   static bool taskInit = false;
   static const uint8_t ledPin =  3;
   static uint8_t ledState = LOW;
 
-  if(taskInit == false){
+  if (taskInit == false) {
     pinMode(ledPin, OUTPUT);
     taskInit = true;
   }
@@ -28,16 +28,17 @@ void sendSignal(){
 }
 
 
-bool sonIguales(char *claveCorrecta, char *claveIngresada)
+bool ComparePasswords(char *input, char *expected)
 {
-  int auxiliar = 0;
+  Serial.println("Comparando");
+  int right = 0;
   for (int i = 0; i < 6; i++) {
-    if (claveCorrecta[i] == claveIngresada[i])
+    if (input[i] == expected[i])
     {
-      auxiliar = auxiliar + 1;
+      right++;
     }
   }
-  if (auxiliar == 6)
+  if (right == 6)
   {
     return true;
   }
@@ -57,9 +58,9 @@ void Bomb()
   const uint32_t interval = 1000;
   static char rightpassword[] = {'d', 'u', 'd', 'd', 'u', 'a'};
   static char answer[6];
-  static int contador = 0;
-  static bool isCorrect = false;
-  static int correctas = 0;
+  static int amountanswers = 0;
+
+
 
   switch (bombstate)
   {
@@ -120,27 +121,26 @@ void Bomb()
 
         }
         //Option to defuse bomb
-        if (Serial.available() > 0)
-        {
-          answer[contador] = Serial.read();
-          contador++;
-          //Serial.println(answer[contador]);
-          // Serial.println(answer);
+        if (Serial.available() > 0) {
 
-          if (contador == 6)
-          {
+          answer[amountanswers] = Serial.read();
+          amountanswers++;
+          Serial.println("añadiendo datos");
 
-            if (sonIguales(answer, rightpassword))
+          if (amountanswers == 6) {
+            Serial.println("6 respuestas");
+            if (ComparePasswords(rightpassword, answer))
             {
-              Serial.println("Desarmada");
-
+              Serial.println("BOMB DEFUSED!");
+              bombstate = BombState::SETUP;
+              counter = 20;
             }
-
-
+            amountanswers = 0;
+            while (Serial.available() > 0)
+            {
+              Serial.read();
+            }
           }
-          correctas = 0;
-          contador = 0;
-
         }
 
 
@@ -152,15 +152,15 @@ void Bomb()
 
 
     default:
-  
 
 
 
 
-  Serial.println("Error");
-  break;
 
-}
+      Serial.println("Error");
+      break;
+
+  }
 }
 
 
